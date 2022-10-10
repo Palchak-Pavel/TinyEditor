@@ -1,10 +1,15 @@
 <template>
   <v-card light>
     <div class="wrap">
+      <v-card class="pa-2 mb-2" elevation="0">
+<v-text-field label="Метатег"></v-text-field>
+<v-text-field label="Заголовок"></v-text-field>
+<v-text-field label="Описание"></v-text-field>
+      </v-card>
 
-      <editor
-        v-model="publishContext"
-        class="wrap"
+        <editor
+        v-model="publishContent"
+        class="editorContext"
         api-key="h9i301p2s1pu6e0a716zckeigcjrd7oi3mkgjzgia3y81htw"
         :init=" {
         language: 'ru',
@@ -34,10 +39,10 @@
       </v-btn>
     </div>
 
-    <template v-if="publishContext">
-      <div v-for="(publishContext, index) in news" :key="index" class="content_text pa-1 mb-3">
+    <template v-if="publishContent">
+      <div v-for="(publishContent, index) in news" :key="index" class="content_text pa-1 mb-3">
         <div>
-          {{ publishContext.publish }}
+          {{ publishContent.publish }}
 
           <div class="newsManagement">
             <v-btn @click="deleteNews(index)"
@@ -73,7 +78,7 @@
 
 <script>
 import Editor from "@tinymce/tinymce-vue";
-
+import axios from 'axios';
 export default {
   components: {
     'editor': Editor
@@ -82,8 +87,10 @@ export default {
 
   data() {
     return {
-      publishContext: "",
+      publishContent: "",
+
       editedNews: null,
+      info:null,
       news: [
         {
           publish: "",
@@ -92,20 +99,27 @@ export default {
     }
   },
 
+  mounted() {
+ /*const axios = require('axios');*/
+    let result = axios.get('https://localhost:7158/news/6332eff4af5c265efadcc2db')
+   .then(response => (this.info = response));
+    console.log(result)
+  },
+
   methods: {
     publishNews() {
-      //if(this.publishContext.length === 0) return;
+      //if(this.publishContent.length === 0) return;
       if (this.editedNews === null) {
         this.news.push({
-          publish: this.publishContext,
+          publish: this.publishContent,
         })
       } else {
-        this.news[this.editedNews].publish = this.publishContext;
+        this.news[this.editedNews].publish = this.publishContent;
         this.editedNews = null;
       }
     },
     editNews(index) {
-      this.publishContext = this.news[index].publish;
+      this.publishContent = this.news[index].publish;
       this.editedNews = index;
     },
     deleteNews(index) {
@@ -116,10 +130,6 @@ export default {
 </script>
 
 <style>
-.inputH1 {
-  border: 1px black solid;
-  margin: 5px;
-}
 
 .content_text {
   border: 1px darkorange solid;
@@ -132,9 +142,11 @@ export default {
 .wrap {
   display: flex;
   flex-direction: column;
-  height: 500px;
 }
 
+.editorContext{
+  height: 400px;
+}
 .publish_btn {
   display: block;
   margin-top: 10px;
