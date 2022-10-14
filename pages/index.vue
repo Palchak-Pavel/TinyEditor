@@ -1,13 +1,14 @@
 <template>
   <v-card light>
     <div class="wrap">
+
       <v-card class="pa-2 mb-2" elevation="0">
-<v-text-field label="Метатег"></v-text-field>
-<v-text-field label="Заголовок"></v-text-field>
-<v-text-field label="Описание"></v-text-field>
+        <v-text-field label="Метатег"></v-text-field>
+        <v-text-field label="Заголовок"></v-text-field>
+        <v-text-field label="Описание"></v-text-field>
       </v-card>
 
-        <editor
+      <editor
         v-model="publishContent"
         class="editorContext"
         api-key="h9i301p2s1pu6e0a716zckeigcjrd7oi3mkgjzgia3y81htw"
@@ -16,7 +17,7 @@
         skin: 'bootstrap',
         selector: 'textarea#default',
         format: 'text',
-/*block_formats: 'Paragraph=p;Heading 2=h2;Heading 3=h3;Heading 4=h4;',*/
+        /*block_formats: 'Paragraph=p;Heading 2=h2;Heading 3=h3;Heading 4=h4;',*/
        /* plugins: [
            'a11ychecker','advlist','advcode','advtable','autolink','checklist','export',
            'lists','link','image','charmap','preview','anchor','searchreplace','visualblocks',
@@ -79,6 +80,7 @@
 <script>
 import Editor from "@tinymce/tinymce-vue";
 import axios from 'axios';
+
 export default {
   components: {
     'editor': Editor
@@ -90,7 +92,7 @@ export default {
       publishContent: "",
 
       editedNews: null,
-      info:null,
+      info: null,
       news: [
         {
           publish: "",
@@ -100,9 +102,9 @@ export default {
   },
 
   mounted() {
- /*const axios = require('axios');*/
-    let result = axios.get('https://localhost:7158/news/6332eff4af5c265efadcc2db')
-   .then(response => (this.info = response));
+    /*const axios = require('axios');*/
+    let result = axios.get('https://localhost:7158/news/')
+      .then(response => (this.info = response));
     console.log(result)
   },
 
@@ -144,9 +146,10 @@ export default {
   flex-direction: column;
 }
 
-.editorContext{
+.editorContext {
   height: 400px;
 }
+
 .publish_btn {
   display: block;
   margin-top: 10px;
