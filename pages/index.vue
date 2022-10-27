@@ -101,11 +101,15 @@ export default {
     }
   },
 
-  mounted() {
+  async mounted() {
     /*const axios = require('axios');*/
-    let result = axios.get('https://localhost:7158/news/')
-      .then(response => (this.info = response));
-    console.log(result)
+    // TODO: я не против такой реализации, но async/await куда лучше и читабельней на мой взгляд
+    /*let result = axios.get('https://localhost:7158/news/')
+      .then(response => (this.info = response));*/
+
+    // Вот такая конструкция сразу достает из ответа полезную нагрузку
+    let {data} = await axios.get('https://localhost:7158/news/');
+    console.log(data)
   },
 
   methods: {
