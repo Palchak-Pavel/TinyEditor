@@ -1,78 +1,109 @@
 <template>
   <v-card light>
     <div class="wrap">
+      <template class="newsView">
+        <v-card class="newsItem" v-for="(news, index) in dataPublish" :key="index">
+<!--        TODO: - Модальное окно для редактирования новости-->
+          <v-dialog v-model="dialog" fullscreen :retain-focus="false">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                small
+                v-bind="attrs"
+                v-on="on">
+                Put
+              </v-btn>
+            </template>
+            <v-card light>
+              <template>
+                <v-form class="form_imp" @submit.prevent="updateNews">
+                  <v-text-field v-model="newsPublish.url" label="Метатег"></v-text-field>
+                  <v-text-field v-model="newsPublish.h1" label="Заголовок"></v-text-field>
+                  <v-text-field v-model="newsPublish.description" label="Описание"></v-text-field>
 
-      <v-card class="pa-2 mb-2" elevation="0">
-        <v-text-field label="Метатег"></v-text-field>
-        <v-text-field label="Заголовок"></v-text-field>
-        <v-text-field label="Описание"></v-text-field>
-      </v-card>
+                  <editor
+                    class="editorContext"
+                    api-key="h9i301p2s1pu6e0a716zckeigcjrd7oi3mkgjzgia3y81htw"
+                    v-model="newsPublish.content"
+                    :init=" {
+                      language: 'ru',
+                      skin: 'bootstrap',
+                      selector: 'textarea#default',
+                      format: 'text',
+                      plugins: 'charmap code insertdatetime table export',
+                      toolbar: 'undo redo | formatselect bold italic underline strikethrough | fontfamily fontsize  | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist ' +
+                               '| forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl | selectall | ' +
+                               'code | codesample | insertdatetime table export',
+                      automatic_uploads: true,
+                      forced_root_block: false,
+                      }"/>
+                </v-form>
+              </template>
+              <v-card-actions>
+                <v-btn small type="submit" color="primary" class="publish_btn" width="150px">
+                  Опубликовать
+                </v-btn>
+                <v-btn small
+                       color="primary"
+                       @click="dialog = false"
+                >
+                  Закрыть
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+<!--          TODO: Конец модального окна для редактирования новости-->
 
-      <editor
-        v-model="publishContent"
-        class="editorContext"
-        api-key="h9i301p2s1pu6e0a716zckeigcjrd7oi3mkgjzgia3y81htw"
-        :init=" {
-        language: 'ru',
-        skin: 'bootstrap',
-        selector: 'textarea#default',
-        format: 'text',
-        /*block_formats: 'Paragraph=p;Heading 2=h2;Heading 3=h3;Heading 4=h4;',*/
-       /* plugins: [
-           'a11ychecker','advlist','advcode','advtable','autolink','checklist','export',
-           'lists','link','image','charmap','preview','anchor','searchreplace','visualblocks',
-           'powerpaste','fullscreen','formatpainter','insertdatetime','media','table','help','wordcount'
-         ],*/
-      plugins: 'charmap code insertdatetime table export',
-       /*'code blocks preview powerpaste casechange importcss tinydrive searchreplace autolink autosave save directionality advcode visualblocks visualchars fullscreen image link media mediaembed template codesample table charmap pagebreak nonbreaking anchor' +
-          ' insertdatetime advlist lists checklist wordcount tinymcespellchecker a11ychecker help formatpainter pageembed charmap mentions quickbars linkchecker emoticons advtable',*/
-        toolbar: 'undo redo | formatselect bold italic underline strikethrough | fontfamily fontsize  | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist ' +
-          '| forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl | selectall | ' +
-           'code | codesample | insertdatetime table export',
+          <v-btn small @click="deleteNews(news.id)" class="primary">
+            Del
+          </v-btn>
 
-        automatic_uploads: true,
-        forced_root_block: false,
-      }"
-      />
-
-      <v-btn @click="publishNews" color="primary" class="publish_btn" width="150px">
-        Опубликовать
-      </v-btn>
-    </div>
-
-    <template v-if="publishContent">
-      <div v-for="(publishContent, index) in news" :key="index" class="content_text pa-1 mb-3">
-        <div>
-          {{ publishContent.publish }}
-
-          <div class="newsManagement">
-            <v-btn @click="deleteNews(index)"
-                   elevation="1"
-                   class="newsManagementBtn mx-2 mb-2"
-                   fab
-                   x-small
-                   color="pink">
-              <v-icon color="white" dark>
-                mdi-delete
-              </v-icon>
-            </v-btn>
-            <v-btn
-              @click="editNews(index)"
-              elevation="1"
-              class="mx-2 mb-2"
-              fab
-              dark
-              x-small
-              color="primary"
-            >
-              <v-icon dark>
-                mdi-pencil
-              </v-icon>
-            </v-btn>
+          <div>
+            {{ news.url }}
+            {{ news.h1 }}
+            {{ news.description }}
+            {{ news.content }}
           </div>
-        </div>
-      </div>
-    </template>
+        </v-card>
+      </template>
+
+      <template>
+        <v-form class="form_imp" @submit.prevent="publishNews">
+          <v-text-field v-model="newsPublish.url" label="Метатег"></v-text-field>
+          <v-text-field v-model="newsPublish.h1" label="Заголовок"></v-text-field>
+          <v-text-field v-model="newsPublish.description" label="Описание"></v-text-field>
+
+          <editor
+            class="editorContext"
+            api-key="h9i301p2s1pu6e0a716zckeigcjrd7oi3mkgjzgia3y81htw"
+            v-model="newsPublish.content"
+            :init=" {
+               language: 'ru',
+               skin: 'bootstrap',
+               selector: 'textarea#default',
+               format: 'text',
+               /*block_formats: 'Paragraph=p;Heading 2=h2;Heading 3=h3;Heading 4=h4;',*/
+             /* plugins: [
+                 'a11ychecker','advlist','advcode','advtable','autolink','checklist','export',
+                 'lists','link','image','charmap','preview','anchor','searchreplace','visualblocks',
+                 'powerpaste','fullscreen','formatpainter','insertdatetime','media','table','help','wordcount'
+                ],*/
+               plugins: 'charmap code insertdatetime table export',
+             /*'code blocks preview powerpaste casechange importcss tinydrive searchreplace autolink autosave save directionality advcode visualblocks visualchars fullscreen image link media mediaembed template codesample table charmap pagebreak nonbreaking anchor' +
+                ' insertdatetime advlist lists checklist wordcount tinymcespellchecker a11ychecker help formatpainter pageembed charmap mentions quickbars linkchecker emoticons advtable',*/
+               toolbar: 'undo redo | formatselect bold italic underline strikethrough | fontfamily fontsize  | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist ' +
+                        '| forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl | selectall | ' +
+                        'code | codesample | insertdatetime table export',
+
+              automatic_uploads: true,
+              forced_root_block: false,
+              }"/>
+          <v-btn type="submit" color="primary" class="publish_btn" width="150px">
+            Опубликовать
+          </v-btn>
+
+        </v-form>
+      </template>
+    </div>
   </v-card>
 </template>
 
@@ -86,63 +117,86 @@ export default {
     'editor': Editor
   },
   name: 'IndexPage',
-
   data() {
     return {
-      publishContent: "",
-
+      dialog: false,
       editedNews: null,
-      info: null,
-      news: [
-        {
-          publish: "",
-        }
-      ],
+      dataPublish: "",
+      newsPublish:
+        [{
+          h1: "",
+          url: "",
+          description: "",
+          content: "",
+        }]
     }
   },
 
   async mounted() {
-    /*const axios = require('axios');*/
-    // TODO: я не против такой реализации, но async/await куда лучше и читабельней на мой взгляд
-    /*let result = axios.get('https://localhost:7158/news/')
-      .then(response => (this.info = response));*/
-
-    // Вот такая конструкция сразу достает из ответа полезную нагрузку
-    let {data} = await axios.get('https://localhost:7158/news/');
-    console.log(data)
+    let {data} = await axios.get('https://localhost:7158/news/')
+      .then(response => (this.dataPublish = response.data))
+    console.log(this.dataPublish)
   },
 
   methods: {
-    publishNews() {
-      //if(this.publishContent.length === 0) return;
-      if (this.editedNews === null) {
-        this.news.push({
-          publish: this.publishContent,
+
+    async publishNews() {
+      let payload = {
+        h1: this.newsPublish.h1,
+        url: this.newsPublish.url,
+        description: this.newsPublish.description,
+        content: this.newsPublish.content,
+      };
+      console.log(payload);
+      await axios.post('https://localhost:7158/news',
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8'
+          }
         })
-      } else {
-        this.news[this.editedNews].publish = this.publishContent;
-        this.editedNews = null;
-      }
+        .then(response => {
+          console.log(response)
+        })
+        .catch(error => {
+          console.log(error.response)
+        });
     },
-    editNews(index) {
-      this.publishContent = this.news[index].publish;
-      this.editedNews = index;
+    async deleteNews(id) {
+      await axios
+        .delete(`https://localhost:7158/news/${id}`)
+        .then(() => {
+          let x = this.newsPublish.map(news => news.id).indexOf(id);
+          this.newsPublish.splice(x, 1)
+        })
     },
-    deleteNews(index) {
-      this.news.splice(index, 1);
+//TODO: не понимаю как сделать обновление(изменение) записи
+    async updateNews() {
+      await axios.put(`https://localhost:7158/news/${id}`, {
+        h1: this.newsPublish.h1,
+        url: this.newsPublish.url,
+        description: this.newsPublish.description,
+        content: this.newsPublish.content,
+      })
+        .then(response => (
+          console.log(response)
+        ))
+      /*   await axios.get(`https://localhost:7158/news/${id}`)
+           .then(response => response.data)
+         await axios.put(`https://localhost:7158/news/${id}`,{
+           h1: this.newsPublish.h1,
+           url: this.newsPublish.url,
+           description: this.newsPublish.description,
+           content: this.newsPublish.content,
+         })*/
     }
   }
 }
 </script>
 
 <style>
-
-.content_text {
-  border: 1px darkorange solid;
-  background-color: antiquewhite;
-  border-radius: 5px;
-  height: 100%;
-  width: 100%;
+.form_imp {
+  padding: 5px;
 }
 
 .wrap {
@@ -160,10 +214,13 @@ export default {
   margin-bottom: 10px;
 }
 
-.newsManagement {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+.newsView {
+  height: 650px;
+  overflow-y: scroll;
+}
+
+.newsItem {
+  padding: 10px;
 }
 </style>
 
