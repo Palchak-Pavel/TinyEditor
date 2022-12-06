@@ -15,31 +15,33 @@
             </template>
             <v-card light>
               <template>
-                <v-form class="form_imp" @submit.prevent="updateNews">
-                  <v-text-field v-model="newsPublish.url" label="Метатег"></v-text-field>
-                  <v-text-field v-model="newsPublish.h1" label="Заголовок"></v-text-field>
-                  <v-text-field v-model="newsPublish.description" label="Описание"></v-text-field>
+                <v-form class="form_imp" >
+                  <v-text-field v-model="news.title" label="Метатег"></v-text-field>
+                  <v-text-field v-model="news.h1" label="Заголовок"></v-text-field>
+                  <v-text-field v-model="news.description" label="Описание"></v-text-field>
 
                   <editor
                     class="editorContext"
                     api-key="h9i301p2s1pu6e0a716zckeigcjrd7oi3mkgjzgia3y81htw"
-                    v-model="newsPublish.content"
+                    v-model="news.content"
                     :init=" {
-                      language: 'ru',
-                      skin: 'bootstrap',
-                      selector: 'textarea#default',
-                      format: 'text',
-                      plugins: 'charmap code insertdatetime table export',
-                      toolbar: 'undo redo | formatselect bold italic underline strikethrough | fontfamily fontsize  | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist ' +
-                               '| forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl | selectall | ' +
-                               'code | codesample | insertdatetime table export',
-                      automatic_uploads: true,
-                      forced_root_block: false,
-                      }"/>
+               language: 'ru',
+               skin: 'bootstrap',
+               selector: 'textarea#default',
+               format: 'text',
+               plugins: 'charmap code insertdatetime table export',
+
+               toolbar: 'undo redo | formatselect bold italic underline strikethrough | fontfamily fontsize  | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist ' +
+                        '| forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl | selectall | ' +
+                        'code | codesample | insertdatetime table export',
+
+              automatic_uploads: true,
+              forced_root_block: false,
+              }"/>
                 </v-form>
               </template>
               <v-card-actions>
-                <v-btn small type="submit" color="primary" class="publish_btn" width="150px">
+                <v-btn small color="primary" class="publish_btn" width="150px" @click="updateNews(news)">
                   Опубликовать
                 </v-btn>
                 <v-btn small
@@ -58,7 +60,7 @@
           </v-btn>
 
           <div>
-            {{ news.url }}
+            {{ news.title }}
             {{ news.h1 }}
             {{ news.description }}
             {{ news.content }}
@@ -68,7 +70,7 @@
 
       <template>
         <v-form class="form_imp" @submit.prevent="publishNews">
-          <v-text-field v-model="newsPublish.url" label="Метатег"></v-text-field>
+          <v-text-field v-model="newsPublish.title" label="Метатег"></v-text-field>
           <v-text-field v-model="newsPublish.h1" label="Заголовок"></v-text-field>
           <v-text-field v-model="newsPublish.description" label="Описание"></v-text-field>
 
@@ -124,8 +126,8 @@ export default {
       dataPublish: "",
       newsPublish:
         [{
+          title: "",
           h1: "",
-          url: "",
           description: "",
           content: "",
         }]
@@ -142,8 +144,8 @@ export default {
 
     async publishNews() {
       let payload = {
+        title: this.newsPublish.title,
         h1: this.newsPublish.h1,
-        url: this.newsPublish.url,
         description: this.newsPublish.description,
         content: this.newsPublish.content,
       };
@@ -170,25 +172,10 @@ export default {
           this.newsPublish.splice(x, 1)
         })
     },
-//TODO: не понимаю как сделать обновление(изменение) записи
-    async updateNews() {
-      await axios.put(`https://localhost:7158/news/${id}`, {
-        h1: this.newsPublish.h1,
-        url: this.newsPublish.url,
-        description: this.newsPublish.description,
-        content: this.newsPublish.content,
-      })
-        .then(response => (
-          console.log(response)
-        ))
-      /*   await axios.get(`https://localhost:7158/news/${id}`)
-           .then(response => response.data)
-         await axios.put(`https://localhost:7158/news/${id}`,{
-           h1: this.newsPublish.h1,
-           url: this.newsPublish.url,
-           description: this.newsPublish.description,
-           content: this.newsPublish.content,
-         })*/
+    async updateNews(news) {
+      console.log(news)
+      const response = await axios.put(`https://localhost:7158/news/${news.id}`, news)
+       console.log(response)
     }
   }
 }
